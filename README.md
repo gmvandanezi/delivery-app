@@ -12,7 +12,7 @@ An account on ElephantSQL for the database.
 
 Clone the Repository:
 ```
-git clone https://github.com/gmvandanezi/my-recipe-app.git
+git clone https://github.com/gmvandanezi/delivery-app.git
 ```
 ```
 cd my-recipe-app
