@@ -1,0 +1,88 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Client {
+  id          String    @id @default(uuid())
+  name        String
+  phoneNumber String    @unique
+  addresses   Address[]
+  orders      Order[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
+
+  @@map("clients")
+}
+
+model Address {
+  id           String   @id @default(uuid())
+  cep          Int
+  street       String
+  number       Int
+  complement   String
+  neighborhood String
+  city         String
+  state        String
+  clientId     String
+  client       Client   @relation(fields: [clientId], references: [id])
+  orders       Order[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
+
+  @@map("addresses")
+}
+
+model Category {
+  id        String    @id @default(uuid())
+  name      String    @unique @default("pizzas")
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Product {
+  id          String          @id @default(uuid())
+  name        String
+  description String
+  price       Decimal
+  imageUrl    String
+  categoryId  String
+  category    Category        @relation(fields: [categoryId], references: [id])
+  orders      OrderProducts[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@map("products")
+}
+
+model Order {
+  id         String          @id @default(uuid())
+  totalValue Decimal
+  clientId   String
+  client     Client          @relation(fields: [clientId], references: [id])
+  addressId  String?
+  address    Address?        @relation(fields: [addressId], references: [id])
+  payment    String          @default("dinheiro")
+  products   OrderProducts[]
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  @@map("orders")
+}
+
+model OrderProducts {
+  id        String   @id @default(uuid())
+  orderId   String?
+  order     Order?   @relation(fields: [orderId], references: [id])
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id])
+  amount    Int
+
+  @@index([orderId, productId])
+  @@map("order_products")
+}
